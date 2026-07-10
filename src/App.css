@@ -1,64 +1,72 @@
-html, body, #root {
+/* ================= 1. 全局重置 (Reset) ================= */
+/* 必须强制把所有父级容器的高度都撑满 100%，并清除默认外边距 */
+html, 
+body, 
+#root {
   margin: 0;
   padding: 0;
   height: 100vh;
-  overflow: hidden;
+  width: 100vw;
+  overflow: hidden; /* 防止全屏时出现双滚动条 */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #ffffff;
 }
 
+/* ================= 2. 布局骨架 (Layout) ================= */
 .app {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: 100vw;
 }
 
 .panes {
   display: flex;
-  flex: 1;
-  height: calc(100vh - 24px);
-  overflow: hidden;
+  flex: 1;                 /* 自动撑满除状态栏以外的剩余垂直空间 */
+  height: calc(100vh - 24px); /* 动态减去底部状态栏的 24px */
+  overflow: hidden;        /* 让外层不滚动，只让内部两栏各自独立滚动 */
 }
 
-.editor, .preview {
+/* ================= 3. 编辑器与预览区 ================= */
+.editor, 
+.preview {
   width: 50%;
   height: 100%;
-  overflow-y: auto;
-  box-sizing: border-box;
+  overflow-y: auto;        /* 关键：允许内容过多时在内部纵向滚动 */
+  box-sizing: border-box;  /* 保证 padding 不会撑大 50% 的宽度 */
   padding: 20px 30px;
 }
 
+/* 左侧输入框美化 */
 .editor {
   border: none;
   border-right: 1px solid #e0e0e0;
-  resize: none;
-  outline: none;
+  resize: none;            /* 禁用右下角的拉伸小三角 */
+  outline: none;           /* 去掉点击时的蓝色边框 */
   font-family: "Fira Code", Consolas, Monaco, monospace;
-  font-size: 15px;
+  font-size: 16px;         /* 稍微加大字号，提升长文本输入体验 */
   line-height: 1.6;
   color: #2c3e50;
   background-color: #fafafa;
 }
 
+/* 右侧预览区排版 */
 .preview {
   color: #333333;
   line-height: 1.7;
   font-size: 16px;
 }
 
-.preview h1 { border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
-.preview code { background-color: rgba(27, 31, 35, 0.05); padding: 0.2em 0.4em; border-radius: 3px; font-family: monospace; }
-.preview pre code { display: block; padding: 1em; overflow-x: auto; }
-
+/* ================= 4. 底部状态栏 ================= */
 .statusbar {
   height: 24px;
   background-color: #f0f0f0;
   border-top: 1px solid #e0e0e0;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-end; /* 靠右对齐 */
   padding: 0 15px;
   font-size: 12px;
   color: #666666;
   gap: 15px;
+  box-sizing: border-box;
 }
