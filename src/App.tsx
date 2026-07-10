@@ -7,6 +7,7 @@ function App() {
   const [content, setContent] = useState("# Hello Paperling\n\n开始写点什么...");
 
   const wordCount = content.trim() === "" ? 0 : content.trim().split(/\s+/).length;
+  const lineCount = content === "" ? 1 : content.split("\n").length;
 
   return (
     <div className="app">
@@ -15,15 +16,19 @@ function App() {
           className="editor"
           value={content}
           onChange={(e) => setContent(e.target.value)}
+          // 关闭浏览器自带的拼写检查
+          spellCheck={false}
+          placeholder="开始你的写作..."
           />
           <div className="preview">
-            <ReactMarkdown remarkPlugins={{remarkGfm}}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {content}
             </ReactMarkdown>
           </div>
       </div>
       <div className="statusbar">
-
+        <div className="statusbar-item">Rows: {lineCount}</div>
+        <div className="statusbar-item">Words: {wordCount}</div>
       </div>
     </div>
   );
