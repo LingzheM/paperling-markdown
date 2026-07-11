@@ -1,22 +1,9 @@
-/* ================= 1. 全局重置 (Reset) ================= */
-/* 必须强制把所有父级容器的高度都撑满 100%，并清除默认外边距 */
-html, 
-body, 
-#root {
-  margin: 0;
-  padding: 0;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden; /* 防止全屏时出现双滚动条 */
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-/* ================= 2. 布局骨架 (Layout) ================= */
 .app {
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+  background-color: var(--bg-primary);
 }
 
 .panes {
@@ -39,34 +26,76 @@ body,
 /* 左侧输入框美化 */
 .editor {
   border: none;
-  border-right: 1px solid #e0e0e0;
+  border-right: 1px solid var(--border);
   resize: none;            /* 禁用右下角的拉伸小三角 */
   outline: none;           /* 去掉点击时的蓝色边框 */
   font-family: "Fira Code", Consolas, Monaco, monospace;
   font-size: 16px;         /* 稍微加大字号，提升长文本输入体验 */
   line-height: 1.6;
-  color: #2c3e50;
-  background-color: #fafafa;
+  color: var(--text-primary);
+  background-color: var(--bg-editor);
 }
 
 /* 右侧预览区排版 */
 .preview {
-  color: #333333;
+  color: var(--text-secondary);
   line-height: 1.7;
   font-size: 16px;
+}
+
+.preview h1 {
+  color: var(--syntax-h1);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3em;
+}
+
+.preview strong {
+  color: var(--syntax-bold);
+}
+
+.preview a {
+  color: var(--syntax-link);
+}
+
+.preview code {
+  background-color: var(--code-bg);
+  color: var(--syntax-code);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.preview pre code {
+  display: block;
+  padding: 1em;
+  overflow-x: auto;
 }
 
 /* ================= 4. 底部状态栏 ================= */
 .statusbar {
   height: 24px;
-  background-color: #f0f0f0;
-  border-top: 1px solid #e0e0e0;
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: flex-end; /* 靠右对齐 */
   padding: 0 15px;
   font-size: 12px;
-  color: #666666;
+  color: var(--text-muted);
   gap: 15px;
   box-sizing: border-box;
+}
+
+.theme-toggle-btn {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-hover);
 }
