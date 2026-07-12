@@ -99,3 +99,41 @@
 .theme-toggle-btn:hover {
   background: var(--bg-hover);
 }
+
+.mode-toggle {
+  display: flex;
+  background-color: var(--bg-editor);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.mode-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.1s ease;
+}
+
+.mode-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.mode-btn.active {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .mode-btn .btn-text { display: none; }
+}
