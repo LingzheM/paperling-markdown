@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from "remark-gfm";
 import { useTheme } from "./context/ThemeContext";
 import './App.css';
+import { CodeEditor } from "./components/CodeEditor";
 
 function App() {
   const [content, setContent] = useState("# Hello Paperling\n\n开始写点什么...");
@@ -14,19 +15,7 @@ function App() {
   return (
     <div className="app">
       <div className="panes">
-        <textarea
-          className="editor"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          // 关闭浏览器自带的拼写检查
-          spellCheck={false}
-          placeholder="开始你的写作..."
-          />
-          <div className="preview">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {content}
-            </ReactMarkdown>
-          </div>
+        <CodeEditor content={content} onChange={setContent} />
       </div>
       <div className="statusbar">
         <button
