@@ -5,6 +5,7 @@ import { useTheme } from "./context/ThemeContext";
 import { CodeEditor } from "./components/CodeEditor";
 import { ModeToggle, type ViewMode } from "./components/ModeToggle";
 import { openFile, saveFile, saveFileAs, isFileSystemSupported } from "./files/fileSystem";
+import { getSavedViewMode, setSavedViewMode } from "./utils/persistence";
 import './App.css';
 
 
@@ -15,7 +16,7 @@ function App() {
   const [fileName, setFileName] = useState<string | null>(null);
   
   const fileHandleRef = useRef<any>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>("split");
+  const [viewMode, setViewModeState] = useState<ViewMode>(getSavedViewMode);
   const { theme, setTheme } = useTheme();
 
   const isDirty = content !== originalContent;
@@ -36,7 +37,12 @@ function App() {
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  })
+  });
+
+  const setViewMode = (m: ViewMode) => {
+    setViewModeState(m);
+    setSavedViewMode(m);
+  }
 
   const handleOpen = async () => {
     if (!isFileSystemSupported) return;
@@ -102,7 +108,7 @@ function App() {
 
       if (e.ctrlKey && e.key.toLowerCase() === "e") {
         e.preventDefault();
-        setViewMode((curr) => (curr === "code" ? "reader" : "code"));
+        setViewMode(viewMode === "code" ? "reader" : "code");
       }
     };
 

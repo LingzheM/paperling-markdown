@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+// src/context/ThemeContext.tsx
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { getSavedTheme, setSavedTheme } from "../utils/persistence";
 
 export type Theme = "light" | "dark";
 
@@ -6,34 +8,27 @@ const ThemeContext = createContext<
   { theme: Theme; setTheme: (t: Theme) => void } | undefined
 >(undefined);
 
-const KEY = "paperling-theme";
-const VALID: Theme[] = ["dark", "light"];
-
 function prefersLight(): boolean {
-  if (
-    typeof window !== "undefined" &&
-    typeof window.matchMedia === "function"
-  ) {
+  if (typeof window !== "undefined" && typeof window.matchMedia === "function") {
     return window.matchMedia("(prefers-color-scheme: light)").matches;
   }
   return false;
 }
 
 function getInitialTheme(): Theme {
-    const stored = localStorage.getItem("paperling-theme");
-    if (stored && VALID.includes(stored as Theme)) return stored as Theme;
+  const saved = getSavedTheme();
+  if (saved === "light" || saved === "dark") return saved;
 
-    if (prefersLight()) return "light";
-
-    return "dark";
+  if (prefersLight()) return "light";
+  return "dark";
 }
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(getInitialTheme);
 
   const setTheme = (t: Theme) => {
     setThemeState(t);
-    localStorage.setItem(KEY, t);
+    setSavedTheme(t);
   };
 
   useEffect(() => {
