@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTheme } from "./context/ThemeContext";
 import { CodeEditor } from "./components/CodeEditor";
-import { ModeToggle, ViewMode } from "./components/ModeToggle";
+import { ModeToggle, type ViewMode } from "./components/ModeToggle";
 import { openFile, saveFile, saveFileAs, isFileSystemSupported } from "./files/fileSystem";
 import { getSavedViewMode, setSavedViewMode, getAutoSave, setAutoSave } from "./utils/persistence";
 import { useAutosave } from "./hooks/useAutosave";

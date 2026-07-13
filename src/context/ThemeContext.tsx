@@ -1,5 +1,5 @@
 // src/context/ThemeContext.tsx
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { getSavedTheme, setSavedTheme } from "../utils/persistence";
 
 export type Theme = "light" | "dark";

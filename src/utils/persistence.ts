@@ -1,5 +1,5 @@
 // src/utils/persistence.ts
-import { ViewMode } from "../components/ModeToggle";
+import type { ViewMode } from "../components/ModeToggle";
 
 const PREFIX = "paperling:";
 
