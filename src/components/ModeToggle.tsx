@@ -1,3 +1,4 @@
+// src/components/ModeToggle.tsx
 export type ViewMode = "code" | "reader" | "split";
 
 interface Props {
@@ -9,7 +10,7 @@ export function ModeToggle({ mode, onChange }: Props) {
   const modes: { value: ViewMode; label: string; icon: string }[] = [
     { value: "code", label: "编辑", icon: "✍️" },
     { value: "split", label: "双栏", icon: "📖" },
-    { value: "reader", label: "预览", icon: "👁️" }, 
+    { value: "reader", label: "预览", icon: "👁️" },
   ];
 
   return (
