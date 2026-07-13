@@ -17,6 +17,9 @@
   --syntax-link: #3498db;
   --syntax-code: #e74c3c;
   --syntax-quote: #7f8c8d;
+
+  --status-unsaved: #e6a23c;
+  --status-saved: #67c23a;
 }
 
 [data-theme="dark"] {
@@ -38,6 +41,9 @@
   --syntax-link: #4fc1ff;
   --syntax-code: #ce9178;
   --syntax-quote: #608b4e;
+
+  --status-unsaved: #e6a23c;
+  --status-saved: #6cbc43;
 }
 
 html,

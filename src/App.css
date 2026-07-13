@@ -71,6 +71,17 @@
   overflow-x: auto;
 }
 
+.save-status-badge {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  background-color: var(--bg-hover);
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
 /* ================= 4. 底部状态栏 ================= */
 .statusbar {
   height: 24px;
