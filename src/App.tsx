@@ -1,33 +1,114 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from "remark-gfm";
 import { useTheme } from "./context/ThemeContext";
-import './App.css';
 import { CodeEditor } from "./components/CodeEditor";
 import { ModeToggle, type ViewMode } from "./components/ModeToggle";
+import { openFile, saveFile, saveFileAs, isFileSystemSupported } from "./files/fileSystem";
+import './App.css';
+
 
 function App() {
+  // 
   const [content, setContent] = useState("# Hello Paperling\n\n开始写点什么...");
+  const [originalContent, setOriginalContent] = useState("# Hello Paperling\n\n");
+  const [fileName, setFileName] = useState<string | null>(null);
+  
+  const fileHandleRef = useRef<any>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("split");
   const { theme, setTheme } = useTheme();
+
+  const isDirty = content !== originalContent;
 
   const wordCount = content.trim() === "" ? 0 : content.trim().split(/\s+/).length;
   const lineCount = content === "" ? 1 : content.split("\n").length;
 
   useEffect(() => {
+    document.title = (isDirty ? "● " : "") + (fileName ?? "Untitled.md") + " - paperling";
+  }, [isDirty, fileName]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  })
+
+  const handleOpen = async () => {
+    if (!isFileSystemSupported) return;
+    try {
+      const fileData = await openFile();
+      if (!fileData) return;
+
+      setContent(fileData.content);
+      setOriginalContent(fileData.content);
+      setFileName(fileData.name);
+      fileHandleRef.current = fileData.handle;
+    } catch (err) {
+      console.error("open file error:", err);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!isFileSystemSupported) return;
+    try {
+      if (fileHandleRef.current) {
+        await saveFile(fileHandleRef.current, content);
+        setOriginalContent(content);
+      } else {
+        await handleSaveAs();
+      }
+    } catch (err) {
+      console.error("save failed:", err);
+    }
+  };
+
+  const handleSaveAs = async () => {
+    if (!isFileSystemSupported) return;
+    try {
+      const fileData = await saveFileAs(content, fileName ?? "Untitled.md");
+      if (!fileData) return;
+
+      setOriginalContent(content);
+      setFileName(fileData.name);
+      fileHandleRef.current = fileData.handle;
+    } catch (err) {
+      console.error("save as failed:", err);
+    }
+  };
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const isCtrl = e.ctrlKey || e.metaKey;
+
+      if (isCtrl && e.key.toLowerCase() === "o") {
+        e.preventDefault();
+        handleOpen();
+      }
+
+      if (isCtrl && !e.shiftKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        handleSave();
+      }
+
+      if (isCtrl && e.shiftKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        handleSaveAs();
+      }
+
       if (e.ctrlKey && e.key.toLowerCase() === "e") {
         e.preventDefault();
-        setViewMode((currentMode) => {
-          if (currentMode === "code") return "reader";
-          return "code";
-        });
+        setViewMode((curr) => (curr === "code" ? "reader" : "code"));
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [viewMode]);
+  }, [content, fileName, viewMode]);
 
   return (
     <div className="app">
@@ -54,6 +135,19 @@ function App() {
       </div>
       <div className="statusbar">
         <ModeToggle mode={viewMode} onChange={setViewMode} />
+
+        <div className="statusbar-file">
+          {isFileSystemSupported ? (
+            <button className="statusbar-btn" onClick={handleOpen}>📁 打开</button>
+          ): (
+            <span style={{ color: "var(--text-muted)" }}>🚫 浏览器不支持本地 I/O</span>
+          )}
+          <span className="file-name-display" onClick={handleSave} style={{ cursor: "pointer" }}>
+            {isDirty ? "● ": ""}
+            {fileName ?? "Untitle.md"}
+          </span>
+        </div>
+
         <button
          className="theme-toggle-btn"
          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
