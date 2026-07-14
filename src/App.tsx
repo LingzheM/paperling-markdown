@@ -119,20 +119,29 @@ function App() {
   };
 
   // 快捷键卡网
+  // ★ 最新值引用快照（同 CodeEditor.tsx 的 onChangeRef 套路）：
+  // 把每次渲染最新的闭包塞进 ref，注册 effect 的依赖数组彻底清空，
+  // 避免 addEventListener/removeEventListener 随 content 按键抖动重跑。
+  const shortcutHandlersRef = useRef({ handleOpen, handleSave, handleSaveAs, viewMode, setViewMode });
+  useEffect(() => {
+    shortcutHandlersRef.current = { handleOpen, handleSave, handleSaveAs, viewMode, setViewMode };
+  });
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const isCtrl = e.ctrlKey || e.metaKey;
+      const { handleOpen, handleSave, handleSaveAs, viewMode, setViewMode } = shortcutHandlersRef.current;
       if (isCtrl && e.key.toLowerCase() === "o") { e.preventDefault(); handleOpen(); }
       if (isCtrl && !e.shiftKey && e.key.toLowerCase() === "s") { e.preventDefault(); handleSave(); }
       if (isCtrl && e.shiftKey && e.key.toLowerCase() === "s") { e.preventDefault(); handleSaveAs(); }
-      if (e.ctrlKey && e.key.toLowerCase() === "e") {
+      if (isCtrl && e.key.toLowerCase() === "e") {
         e.preventDefault();
         setViewMode(viewMode === "code" ? "reader" : "code");
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [content, fileName, viewMode]);
+  }, []);
 
   // 标题联动
   useEffect(() => {
