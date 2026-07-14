@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import { useTheme } from "./context/ThemeContext";
 import { CodeEditor } from "./components/CodeEditor";
 import { ModeToggle, type ViewMode } from "./components/ModeToggle";
+import { MarkdownPreview } from "./components/MarkdownPreview";
 import { openFile, saveFile, saveFileAs, isFileSystemSupported } from "./files/fileSystem";
 import { getSavedViewMode, setSavedViewMode, getAutoSave, setAutoSave } from "./utils/persistence";
 import { useAutosave } from "./hooks/useAutosave";
@@ -170,7 +171,7 @@ function App() {
         )}
         {(viewMode === "reader" || viewMode === "split") && (
           <div className="preview" style={{ width: viewMode === "split" ? "50%" : "100%", borderLeft: viewMode === "split" ? "1px solid var(--border)" : "none" }}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+            <MarkdownPreview content={content} />
           </div>
         )}
       </div>
