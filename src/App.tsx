@@ -148,6 +148,18 @@ function App() {
     document.title = (isDirty ? "● " : "") + (fileName ?? "Untitled.md") + " — Paperling";
   }, [isDirty, fileName]);
 
+  // 关闭/刷新前拦截未保存的改动
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isDirty]);
+
   return (
     <div className="app">
       <div className="panes">
