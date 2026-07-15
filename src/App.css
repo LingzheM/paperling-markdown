@@ -233,3 +233,13 @@
   margin: 0 !important;
   font-size: 12px;
 }
+
+.mermaid-diagram {
+  display: flex;
+  justify-content: center;
+  margin: 1em 0;
+}
+
+.mermaid-diagram svg {
+  max-width: 100%;
+}

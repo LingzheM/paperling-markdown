@@ -1,12 +1,14 @@
-import ReactMarkdown, { defaultUrlTransform } from 'react-markdown';
+import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
+import mermaid from 'mermaid';
 import 'katex/dist/katex.min.css';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 const SANITIZE_SCHEMA = {
   ...defaultSchema,
@@ -76,10 +78,10 @@ function CodeBlock({ children, ...rest}: React.HTMLAttributes<HTMLPreElement>) {
     return <MermaidBlock code={codeText} />;
   }
 
-  return <StandardCodeBlock codeText={codeText} className={className} originalPreprops={rest} children={children} />;
+  return <StandardCodeBlock codeText={codeText} originalPreprops={rest} children={children} />;
 }
 
-function StandardCodeBlock({ codeText, className, originalPreprops, children }: any) {
+function StandardCodeBlock({ codeText, originalPreprops, children }: any) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -107,10 +109,43 @@ function StandardCodeBlock({ codeText, className, originalPreprops, children }: 
 }
 
 function MermaidBlock({ code }: { code: string }) {
-  return (
-    <div className='mermaid-block-holder'>
-      <div className="mermaid-badge">📊 Mermaid 图表已拦截</div>
-      <pre className='mermaid-code-preview'><code>{code}</code></pre>
-    </div>
-  );
+  const { theme } = useTheme();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    // ★ mermaid 的图表可以带可点击链接/tooltip，securityLevel: "strict" 关掉那部分潜在的注入面，
+    //   跟思想 1 的消毒精神保持一致。每次渲染前重新 initialize 是切主题的官方推荐做法。
+    mermaid.initialize({ startOnLoad: false, securityLevel: "strict", theme: theme === "dark" ? "dark" : "default" });
+
+    // id 必须每次渲染都换一个新的：mermaid.render 会往 DOM 里插临时节点，
+    // 复用同一个 id 在 StrictMode 的双调用下会撞车。
+    const id = `mermaid-${Math.random().toString(36).slice(2)}`;
+
+    mermaid.render(id, code)
+      .then(({ svg }) => {
+        if (cancelled || !containerRef.current) return;
+        setError(null);
+        containerRef.current.innerHTML = svg;
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : String(err));
+      });
+
+    return () => { cancelled = true; };
+  }, [code, theme]);
+
+  if (error) {
+    return (
+      <div className="mermaid-block-holder">
+        <div className="mermaid-badge">⚠️ Mermaid 渲染失败：{error}</div>
+        <pre className="mermaid-code-preview"><code>{code}</code></pre>
+      </div>
+    );
+  }
+
+  return <div className="mermaid-diagram" ref={containerRef} />;
 }

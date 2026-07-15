@@ -1,7 +1,5 @@
 // src/App.tsx
 import { useState, useEffect, useRef, useCallback } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { useTheme } from "./context/ThemeContext";
 import { CodeEditor } from "./components/CodeEditor";
 import { ModeToggle, type ViewMode } from "./components/ModeToggle";
