@@ -19,6 +19,10 @@ function App() {
   // ★ C3. 自动保存开关状态（惰性初始化）
   const [isAutoSaveEnabled, setIsAutoSaveEnabled] = useState<boolean>(getAutoSave);
   
+  // ★ 不变量：fileHandleRef.current 和 fileName 永远同生共死——
+  //   handleOpen/handleSaveAs 里两个一起设，初始值也一起是 null，从不单独改其中一个。
+  //   所以任何只是想知道"当前有没有打开的文件"的地方，用 fileName !== null 就够，
+  //   不需要（也不该在渲染期间）去读 ref。
   const fileHandleRef = useRef<any>(null);
   const { theme, setTheme } = useTheme();
 
@@ -61,7 +65,7 @@ function App() {
   // 挂载自动保存核心 Hook
   useAutosave({
     enabled: isAutoSaveEnabled,
-    canSave: fileHandleRef.current !== null, // 必须有打开的文件
+    canSave: fileName !== null, // 必须有打开的文件（fileName 和 fileHandleRef 同生共死，渲染期不读 ref）
     content,
     originalContent,
     onSave: handleAutoSave,
