@@ -23,7 +23,7 @@ function App() {
   //   handleOpen/handleSaveAs 里两个一起设，初始值也一起是 null，从不单独改其中一个。
   //   所以任何只是想知道"当前有没有打开的文件"的地方，用 fileName !== null 就够，
   //   不需要（也不该在渲染期间）去读 ref。
-  const fileHandleRef = useRef<any>(null);
+  const fileHandleRef = useRef<FileSystemFileHandle | null>(null);
   const { theme, setTheme } = useTheme();
 
   // -----------------------------------------------------------------
