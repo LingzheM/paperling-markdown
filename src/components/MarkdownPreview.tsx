@@ -126,9 +126,9 @@ function MermaidBlock({ code }: { code: string }) {
 
     mermaid.render(id, code)
       .then(({ svg }) => {
-        if (cancelled || !containerRef.current) return;
+        if (cancelled) return;
         setError(null);
-        containerRef.current.innerHTML = svg;
+        if (containerRef.current) containerRef.current.innerHTML = svg;
       })
       .catch((err) => {
         if (cancelled) return;
@@ -138,14 +138,19 @@ function MermaidBlock({ code }: { code: string }) {
     return () => { cancelled = true; };
   }, [code, theme]);
 
-  if (error) {
-    return (
-      <div className="mermaid-block-holder">
-        <div className="mermaid-badge">⚠️ Mermaid 渲染失败：{error}</div>
-        <pre className="mermaid-code-preview"><code>{code}</code></pre>
-      </div>
-    );
-  }
-
-  return <div className="mermaid-diagram" ref={containerRef} />;
+  // ★ 容器 div 必须无条件挂载，不能只在"无错误"分支才渲染：
+  //   之前的版本在 error 分支里不渲染这个 div，导致下一次渲染成功时
+  //   .then 里 containerRef.current 永远是 null，setError(null) 被提前 return 挡住，
+  //   错误状态一旦出现过一次就再也清不掉了（哪怕后续代码完全合法）。
+  return (
+    <>
+      {error && (
+        <div className="mermaid-block-holder">
+          <div className="mermaid-badge">⚠️ Mermaid 渲染失败：{error}</div>
+          <pre className="mermaid-code-preview"><code>{code}</code></pre>
+        </div>
+      )}
+      <div className="mermaid-diagram" ref={containerRef} style={error ? { display: "none" } : undefined} />
+    </>
+  );
 }
