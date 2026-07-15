@@ -7,6 +7,7 @@ import { MarkdownPreview } from "./components/MarkdownPreview";
 import { openFile, saveFile, saveFileAs, isFileSystemSupported } from "./files/fileSystem";
 import { getSavedViewMode, setSavedViewMode, getAutoSave, setAutoSave } from "./utils/persistence";
 import { useAutosave } from "./hooks/useAutosave";
+import { useDebouncedValue } from "./hooks/useDebouncedValue";
 import "./App.css";
 
 function App() {
@@ -35,6 +36,10 @@ function App() {
   const isDirty = content !== originalContent;
   const wordCount = content.trim() === "" ? 0 : content.trim().split(/\s+/).length;
   const lineCount = content === "" ? 1 : content.split("\n").length;
+
+  // ★ 思想 2：打字的关键路径（编辑器）继续吃 content，零延迟；
+  //   预览吃这个滞后 300ms 的副本，把 KaTeX/highlight/整棵树重算挪出打字热路径。
+  const debouncedContent = useDebouncedValue(content, 300);
 
   // -----------------------------------------------------------------
   // ★ C2. handleAutoSave 的接线：引用绝对固定的回调
@@ -169,7 +174,7 @@ function App() {
         )}
         {(viewMode === "reader" || viewMode === "split") && (
           <div className="preview" style={{ width: viewMode === "split" ? "50%" : "100%", borderLeft: viewMode === "split" ? "1px solid var(--border)" : "none" }}>
-            <MarkdownPreview content={content} />
+            <MarkdownPreview content={debouncedContent} />
           </div>
         )}
       </div>
