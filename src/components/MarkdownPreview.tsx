@@ -61,32 +61,45 @@ export function MarkdownPreview({ content }: Props) {
   );
 }
 
+interface CodeElementProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
 function CodeBlock({ children, ...rest}: React.HTMLAttributes<HTMLPreElement>) {
   const codeElement = React.Children.toArray(children).find(
-    (child) => React.isValidElement(child) && child.type === "code"
+    (child): child is React.ReactElement<CodeElementProps> =>
+      React.isValidElement(child) && child.type === "code"
   );
 
-  if (!React.isValidElement(codeElement)) {
+  if (!codeElement) {
     return <pre {...rest}>{children}</pre>
   }
 
-  const className = (codeElement.props as any).className || "";
-  const codeText = String((codeElement.props as any).children || "").trim();
-  const isMermaid = className.includes("language-mermaid");
+  const isMermaid = (codeElement.props.className ?? "").includes("language-mermaid");
 
   if (isMermaid) {
+    const codeText = String(codeElement.props.children ?? "").trim();
     return <MermaidBlock code={codeText} />;
   }
 
-  return <StandardCodeBlock codeText={codeText} originalPreprops={rest} children={children} />;
+  return <StandardCodeBlock originalPreprops={rest}>{children}</StandardCodeBlock>;
 }
 
-function StandardCodeBlock({ codeText, originalPreprops, children }: any) {
+interface StandardCodeBlockProps {
+  originalPreprops: React.HTMLAttributes<HTMLPreElement>;
+  children?: React.ReactNode;
+}
+
+function StandardCodeBlock({ originalPreprops, children }: StandardCodeBlockProps) {
   const [copied, setCopied] = useState(false);
+  const preRef = useRef<HTMLPreElement>(null);
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(codeText);
+      // ★ 从渲染出来的 DOM 读 innerText，而不是攒一份平行的 codeText 字符串——
+      //   高亮之后的 <code> 是一堆嵌套 span，DOM 是唯一天然保证"跟屏幕上看到的一致"的来源。
+      await navigator.clipboard.writeText(preRef.current?.innerText ?? "");
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -103,7 +116,7 @@ function StandardCodeBlock({ codeText, originalPreprops, children }: any) {
       >
         {copied ? "✓ 已复制" : "📋 复制"}
       </button>
-      <pre {...originalPreprops}>{children}</pre>
+      <pre ref={preRef} {...originalPreprops}>{children}</pre>
     </div>
   );
 }
