@@ -8,11 +8,11 @@ export interface FileData {
 export const isFileSystemSupported =
   typeof window !== "undefined" && "showOpenFilePicker" in window;
 
-const FILE_PICKER_OPTIONS = {
+const FILE_PICKER_OPTIONS: { types: FilePickerAcceptType[] } = {
   types: [
     {
-      "description": "Markdown ",
-      "accept": {
+      description: "Markdown ",
+      accept: {
         "text/markdown": [".md", ".markdown"],
         "text/plain": [".txt"]
       }
@@ -36,13 +36,12 @@ export async function openFile(): Promise<FileData | null> {
   }
 }
 
-export async function saveFile(handle: any, content: string): Promise<number> {
-  const fileHandle = handle as FileSystemFileHandle;
-  const writable = await fileHandle.createWritable();
+export async function saveFile(handle: FileSystemFileHandle, content: string): Promise<number> {
+  const writable = await handle.createWritable();
   await writable.write(content);
   await writable.close();
 
-  const file = await fileHandle.getFile();
+  const file = await handle.getFile();
   return file.lastModified;
 }
 
