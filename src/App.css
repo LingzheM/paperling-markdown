@@ -71,6 +71,56 @@
   overflow-x: auto;
 }
 
+/* ★ NEW-2：rehype-highlight 吐出来的 .hljs-* 类名，映射到 CodeEditor.tsx 编辑器已经在用的
+   同一套 --syntax-* 变量上，让预览区的代码高亮跟编辑器高亮保持同一套配色，而不是另起一套。 */
+.hljs-comment,
+.hljs-quote {
+  color: var(--syntax-quote);
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-subst {
+  color: var(--syntax-link);
+}
+
+.hljs-string,
+.hljs-doctag,
+.hljs-regexp,
+.hljs-number,
+.hljs-symbol,
+.hljs-attribute {
+  color: var(--syntax-code);
+}
+
+.hljs-title,
+.hljs-name,
+.hljs-section,
+.hljs-selector-id,
+.hljs-selector-class {
+  color: var(--syntax-bold);
+  font-weight: bold;
+}
+
+.hljs-type,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-tag,
+.hljs-variable,
+.hljs-template-variable {
+  color: var(--syntax-h1);
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
 .save-status-badge {
   font-size: 11px;
   font-weight: bold;
